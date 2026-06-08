@@ -26,7 +26,14 @@ def headers():
 def api(method, path, **kwargs):
     url = f"{BASE_URL}/api/v2{path}"
     resp = requests.request(method, url, headers=headers(), **kwargs)
-    resp.raise_for_status()
+    if resp.status_code >= 400:
+        msg = f"API {method} {path} failed: {resp.status_code}"
+        try:
+            detail = resp.json()
+            msg = f"{msg}\n{json.dumps(detail, ensure_ascii=False, indent=2)}"
+        except Exception:
+            msg = f"{msg}\n{resp.text}"
+        raise Exception(msg)
     if resp.content:
         return resp.json()
     return {}
@@ -119,6 +126,19 @@ def update_work_item(
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 
+def _discover_project_attributes(project_id: str) -> dict:
+    items = api("POST", "/workItems/search?skip=0&take=1", json={"projectIds": [project_id]})
+    if isinstance(items, list):
+        items = items
+    elif isinstance(items, dict):
+        items = items.get("items", items.get("data", []))
+    for item in items:
+        attrs = item.get("attributes")
+        if attrs:
+            return attrs
+    return {}
+
+
 @mcp.tool()
 def create_work_item(
     project_id: str,
@@ -150,6 +170,9 @@ def create_work_item(
         attributes: Optional map of project attributes
         tag_names: Optional list of tag names to attach
     """
+    if attributes is None:
+        attributes = _discover_project_attributes(project_id)
+
     body = {
         "projectId": project_id,
         "sectionId": section_id,
@@ -159,7 +182,7 @@ def create_work_item(
         "state": state,
         "priority": priority,
         "duration": 1,
-        "attributes": attributes or {},
+        "attributes": attributes,
         "tags": tag_names or [],
         "links": [],
     }
