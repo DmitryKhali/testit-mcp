@@ -5,6 +5,7 @@ MCP server for [Test IT](https://testit.ru) — connects Claude to your Test IT 
 ## What it does
 
 - Browse projects, sections, and test cases
+- Create test cases, checklists, and shared steps
 - Search and read test cases (work items) by name or globalId
 - View test plans with progress analytics
 - Get test point results per plan or run
@@ -71,6 +72,7 @@ Restart Claude Desktop. The `testit` tools will appear automatically.
 |---|---|
 | `get_projects` | List all projects |
 | `get_sections` | Get sections (folders) for a project |
+| `create_work_item` | Create a test case, checklist, or shared step |
 | `get_work_item` | Get a test case by UUID or globalId |
 | `search_work_items` | Search test cases by name, state, type |
 | `update_work_item` | Update steps, preconditions, state, priority |
@@ -86,6 +88,9 @@ Restart Claude Desktop. The `testit` tools will appear automatically.
 | `get_users` | List project users (may require elevated permissions) |
 
 ## Usage examples
+
+**Create a checklist:**
+> "Create a checklist 'Login flow' in the Authentication section with steps: open login page, enter credentials, verify success"
 
 **Read a test case:**
 > "Show me test case 12345"

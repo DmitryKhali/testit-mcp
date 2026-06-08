@@ -119,6 +119,69 @@ def update_work_item(
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 
+@mcp.tool()
+def create_work_item(
+    project_id: str,
+    section_id: str,
+    name: str,
+    entity_type: str,
+    steps: list[dict] = None,
+    precondition_steps: list[dict] = None,
+    postcondition_steps: list[dict] = None,
+    state: str = "Ready",
+    priority: str = "Medium",
+    description: str = None,
+    attributes: dict = None,
+    tag_names: list[str] = None,
+) -> str:
+    """Create a new work item (test case, checklist, or shared step).
+
+    Args:
+        project_id: UUID of the project
+        section_id: UUID of the section (folder) to place the item in
+        name: Title of the work item
+        entity_type: TestCases, CheckLists, or SharedSteps
+        steps: list of {action, expected} dicts — main steps
+        precondition_steps: list of {action, expected} dicts — preconditions
+        postcondition_steps: list of {action, expected} dicts — postconditions
+        state: Ready, Draft, NeedsWork, Invalid (default: Ready)
+        priority: Lowest, Low, Medium, High, Highest (default: Medium)
+        description: Optional description text
+        attributes: Optional map of project attributes
+        tag_names: Optional list of tag names to attach
+    """
+    body = {
+        "projectId": project_id,
+        "sectionId": section_id,
+        "name": name,
+        "entityType": entity_type,
+        "entityTypeName": entity_type,
+        "state": state,
+        "priority": priority,
+        "duration": 1,
+        "attributes": attributes or {},
+        "tags": tag_names or [],
+        "links": [],
+    }
+    if description is not None:
+        body["description"] = description
+    body["steps"] = [
+        {"action": s.get("action", ""), "expected": s.get("expected", "")}
+        for s in (steps or [])
+    ]
+    body["preconditionSteps"] = [
+        {"action": s.get("action", ""), "expected": s.get("expected", "")}
+        for s in (precondition_steps or [])
+    ]
+    body["postconditionSteps"] = [
+        {"action": s.get("action", ""), "expected": s.get("expected", "")}
+        for s in (postcondition_steps or [])
+    ]
+
+    result = api("POST", "/workItems", json=body)
+    return json.dumps(result, ensure_ascii=False, indent=2)
+
+
 # ── Projects & Sections ──────────────────────────────────────────────────────
 
 @mcp.tool()
