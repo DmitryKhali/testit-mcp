@@ -10,7 +10,7 @@ MCP server for [Test IT](https://testit.ru) — connects Claude to your Test IT 
 - View test plans with progress analytics
 - Get test point results per plan or run
 - Update test case content (steps, preconditions, postconditions, state, priority)
-- Change test result outcomes (Passed / Failed / Blocked / Skipped)
+- Change test result outcomes (In Progress / Passed / Failed / Blocked / Skipped) on any test point, started or not
 - Assign testers to test points in a plan
 
 ## Requirements
@@ -82,10 +82,14 @@ Restart Claude Desktop. The `testit` tools will appear automatically.
 | `get_plan_results` | Test point results for a plan (filterable by status) |
 | `get_run_results` | Test point results for a standalone run |
 | `get_test_result` | Full details of a single result |
-| `update_test_result` | Set outcome and comment on a result |
+| `set_test_point_status` | Set status of any test point in a plan, even ones with no result yet |
+| `update_test_result` | Set outcome and comment on an existing result |
 | `search_test_results` | Search results by run and outcome |
 | `assign_tester` | Assign a tester to test points in a plan |
 | `get_users` | List project users (may require elevated permissions) |
+| `move_work_items` | Move work items between sections |
+| `rename_section` | Rename a section (folder) |
+| `add_attachment` | Upload a local file and link it to a work item |
 
 ## Usage examples
 
@@ -100,6 +104,9 @@ Restart Claude Desktop. The `testit` tools will appear automatically.
 
 **Update a result:**
 > "Mark this test case as Passed, add comment 'verified on device'"
+
+**Start working a case in a plan:**
+> "Set test case 12345 to In Progress in the regression plan"
 
 **Assign a tester:**
 > "Assign John to test cases 12345 and 12346 in the regression plan"
